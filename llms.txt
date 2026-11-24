@@ -1,0 +1,51 @@
+# reddit-cli
+
+> Read-only Reddit research CLI. The binary is `reddit`. It browses subreddits, searches, reads threads, looks up users, and indexes fetched posts and comments locally.
+
+## Reference
+
+- [README](https://github.com/Microck/reddit-cli/blob/main/README.md): Install, configure, and run the CLI.
+- [Specification](https://github.com/Microck/reddit-cli/blob/main/docs/spec.md): Full command, backend, output, error, and store contracts.
+- `reddit skills list` lists embedded skills. `reddit skills get NAME` prints one.
+
+## Global flags
+
+- `--source auto|live|archive`: Flag, then `REDDIT_CLI_SOURCE`, then config, then `auto`. Auto chooses live when app-only OAuth credentials resolve and archive otherwise. Archive uses Arctic Shift without credentials. Selection stays fixed for the command.
+- `--format auto|json|jsonl|md|pretty`: Defaults to auto, which emits pretty in a terminal and JSON otherwise. Environment default: `REDDIT_CLI_FORMAT`.
+- `--offline`: Local store only, ignoring TTL.
+- `--refresh`: Skip cache reads and still write.
+- `--no-cache`: Skip reads and writes, including the item store.
+- `-q` / `--quiet`: Suppress progress and notes on stderr.
+
+## Commands
+
+- `reddit sub NAME [--sort SORT] [--time TIME] [--limit N] [--after CURSOR]`. Default sort is hot. Archive supports new only.
+- `reddit about NAME`. Read subreddit details from either source.
+- `reddit search QUERY [-s NAME]... [--type posts|comments|subs|users] [--sort SORT] [--time TIME] [--author U] [--since DATE] [--until DATE] [--limit N] [--after CURSOR] [--rank interleave|score|new|comments] [--comments K]`. Defaults to posts, relevance, and interleave. Archive post and comment searches require a subreddit or author filter. Archive accepts new or relevance, which it treats as new. Live supports `--time`. Archive supports `--author`, `--since`, and `--until`, and is the only source for comment search. Repeated `--sub` merges results and disallows `--after`. `--comments K` attaches top root comments to post results.
+- `reddit thread URL_OR_ID [--comment ID] [--sort SORT] [--depth N] [--limit N] [--full] [--max-requests N] [-o FILE]`. Live expands hidden replies with `--full` and defaults to 50 requests. Archive applies top, new, or old sort locally. Share URLs with `/s/` require a canonical thread URL instead. `-o` writes output based on the file extension or selected format.
+- `reddit user NAME [--posts | --comments | --overview] [--sort SORT] [--time TIME] [--since DATE] [--until DATE] [--limit N] [--after CURSOR]`. Defaults to overview and new. Live supports `--time` and additional sorts. Archive supports date ranges.
+- `reddit cache search FTS_QUERY [-s NAME] [--author U] [--kind post|comment] [--limit N]`. Uses SQLite FTS5.
+- `reddit cache stats`, `reddit cache prune [--older-than DURATION]`, `reddit cache clear`. Prune defaults to configured retention (30d by default). Clear deletes the store and cached token.
+- `reddit auth status`, `reddit auth login --client-id ID [--client-secret-stdin] [--user-agent UA]`, `reddit auth logout`. The environment takes precedence over config for `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, and `REDDIT_USER_AGENT`.
+- `reddit completions SHELL`. Prints a completion script for the named shell.
+
+Limits default to 25 for listings and 200 for threads, up to 1000. Reuse `meta.after` only with the source that issued it. Dates accept YYYY-MM-DD, RFC3339, epoch seconds, and relative values like `30d`, `12h`, `6m` (months), or `1y`.
+
+## Output
+
+JSON success on stdout uses `{"data": ..., "meta": {"source": "live|archive|store", "cached": false, "fetched_at": "...", "after": null, "notes": []}}`. Command-specific fields may appear inside `meta`. Read notes for archive caveats and partial search failures. Archive scores and comment counts can be null.
+
+JSONL writes one item per line for lists. Threads write the post followed by comments in pre-order with depth. Other payloads use a one-line envelope.
+
+Errors go to stderr. In JSON or JSONL, read `error.code`, `message`, `retryable`, `http_status`, `retry_after`, `hint`, and `suggested_commands`.
+
+| Exit | Codes |
+| --- | --- |
+| 2 | `E_USAGE`, `E_UNSUPPORTED`, `E_SHARE_LINK` |
+| 3 | `E_AUTH`, `E_CONFIG` |
+| 4 | `E_NOT_FOUND` |
+| 5 | `E_RATE_LIMITED` |
+| 6 | `E_NETWORK` |
+| 7 | `E_UPSTREAM` |
+| 8 | `E_OFFLINE_MISS` |
+| 9 | `E_STORE_SCHEMA` |

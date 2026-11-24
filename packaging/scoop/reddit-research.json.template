@@ -1,0 +1,23 @@
+{
+  "version": "@VERSION@",
+  "description": "Read-only Reddit research CLI",
+  "homepage": "https://github.com/Microck/reddit-cli",
+  "license": "MIT",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/Microck/reddit-cli/releases/download/v@VERSION@/reddit-v@VERSION@-x86_64-pc-windows-msvc.zip",
+      "hash": "@SHA256_WINDOWS_X64@"
+    }
+  },
+  "bin": "reddit.exe",
+  "checkver": {
+    "github": "https://github.com/Microck/reddit-cli"
+  },
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/Microck/reddit-cli/releases/download/v$version/reddit-v$version-x86_64-pc-windows-msvc.zip"
+      }
+    }
+  }
+}

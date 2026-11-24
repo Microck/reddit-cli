@@ -1,0 +1,38 @@
+class RedditResearch < Formula
+  desc "Read-only Reddit research CLI"
+  homepage "https://github.com/Microck/reddit-cli"
+  version "@VERSION@"
+  license "MIT"
+
+  on_macos do
+    on_arm do
+      url "https://github.com/Microck/reddit-cli/releases/download/v@VERSION@/reddit-v@VERSION@-aarch64-apple-darwin.tar.gz"
+      sha256 "@SHA256_MACOS_ARM64@"
+    end
+
+    on_intel do
+      url "https://github.com/Microck/reddit-cli/releases/download/v@VERSION@/reddit-v@VERSION@-x86_64-apple-darwin.tar.gz"
+      sha256 "@SHA256_MACOS_X64@"
+    end
+  end
+
+  on_linux do
+    on_arm do
+      url "https://github.com/Microck/reddit-cli/releases/download/v@VERSION@/reddit-v@VERSION@-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "@SHA256_LINUX_ARM64@"
+    end
+
+    on_intel do
+      url "https://github.com/Microck/reddit-cli/releases/download/v@VERSION@/reddit-v@VERSION@-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "@SHA256_LINUX_X64@"
+    end
+  end
+
+  def install
+    bin.install "reddit"
+  end
+
+  test do
+    assert_match "reddit", shell_output("#{bin}/reddit --help")
+  end
+end

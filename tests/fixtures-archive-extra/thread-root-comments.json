@@ -1,0 +1,48 @@
+{
+  "data": [
+    {
+      "id": "19syx0131orhg",
+      "link_id": "t3_1y1v3iw",
+      "parent_id": "t3_1y1v3iw",
+      "subreddit": "rust",
+      "author": "rust-ModTeam",
+      "body": "**TL;DR: We ask that posts & articles submitted to r/rust abide by the [No Code Dumps](https://www.reddit.com/mod/rust/wiki/rules#wiki_7._no_code_dumps) rules.**\n\n---\n\nYour post, or the article it links to, appears not to abide by the [No Code Dumps](https://www.reddit.com/mod/rust/wiki/rules#wiki_7._no_code_dumps) rules.\n\nWe invite you to double-check the rules, as well as their Q&A.\n\n---\n\nFor any question or dispute, please [send us a modmail](https://www.reddit.com/message/compose/?to=/r/rust).",
+      "permalink": "/r/rust/comments/1y1v3iw/removed_by_moderator/19syx0131orhg/",
+      "created_utc": 1795262821,
+      "score": 1
+    },
+    {
+      "id": "19sywwtw4r9r7",
+      "link_id": "t3_1y1v3iw",
+      "parent_id": "t3_1y1v3iw",
+      "subreddit": "rust",
+      "author": "edfloreshz",
+      "body": "Why is this using Tauri? Why have a web view just for this?",
+      "permalink": "/r/rust/comments/1y1v3iw/removed_by_moderator/19sywwtw4r9r7/",
+      "created_utc": 1795262701,
+      "score": 1
+    },
+    {
+      "id": "19sywgn5rrk81",
+      "link_id": "t3_1y1v3iw",
+      "parent_id": "t3_1y1v3iw",
+      "subreddit": "rust",
+      "author": "PortPiscarilius",
+      "body": "You built it or Claude built it?",
+      "permalink": "/r/rust/comments/1y1v3iw/removed_by_moderator/19sywgn5rrk81/",
+      "created_utc": 1795262096,
+      "score": 1
+    },
+    {
+      "id": "19syw3f1yhlpg",
+      "link_id": "t3_1y1v3iw",
+      "parent_id": "t3_1y1v3iw",
+      "subreddit": "rust",
+      "author": "dreamlax",
+      "body": "This is a code dump, which are not allowed in this subreddit.",
+      "permalink": "/r/rust/comments/1y1v3iw/removed_by_moderator/19syw3f1yhlpg/",
+      "created_utc": 1795261602,
+      "score": 5
+    }
+  ]
+}

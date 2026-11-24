@@ -1,0 +1,48 @@
+[package]
+name = "reddit-research"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98"
+description = "Read-only Reddit research CLI over the Reddit API and the Arctic Shift archive"
+license = "MIT"
+repository = "https://github.com/Microck/reddit-cli"
+readme = "README.md"
+keywords = ["reddit", "cli", "research", "arctic-shift", "agents"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "reddit"
+path = "src/main.rs"
+
+[dependencies]
+# Typed command-line parsing.
+clap = { version = "=4.5.53", features = ["derive"] }
+# Shell scripts generated from the same command definitions.
+clap_complete = "=4.5.61"
+# Calendar dates, RFC3339 timestamps and relative dates.
+chrono = { version = "=0.4.42", default-features = false, features = ["clock", "std"] }
+# Platform config and data directories.
+directories = "=6.0.0"
+# Retry-After accepts an HTTP date as well as seconds.
+httpdate = "=1.0.3"
+# Blocking HTTP with structured query encoding. native-tls, not rustls: Reddit's edge
+# answers rustls clients with an HTML 403 block page while the same token and
+# User-Agent over OpenSSL get JSON (verified 2026-11-24). Vendored OpenSSL keeps Linux
+# release binaries free of a system libssl dependency; macOS/Windows use the OS stack.
+reqwest = { version = "=0.12.28", default-features = false, features = ["blocking", "json", "native-tls-vendored"] }
+# No-echo interactive secret entry.
+rpassword = "=7.4.0"
+# The local store includes its own SQLite with FTS5.
+rusqlite = { version = "=0.37.0", features = ["bundled"] }
+# Typed configuration and structured output.
+serde = { version = "=1.0.228", features = ["derive"] }
+# API bodies, cache records and JSON output.
+serde_json = "=1.0.145"
+# Atomic replacement of private files and isolated test state.
+tempfile = "=3.23.0"
+# Human-readable configuration.
+toml = "=0.9.8"
+
+[dev-dependencies]
+# Real loopback HTTP fixtures for integration tests.
+tiny_http = "=0.12.0"

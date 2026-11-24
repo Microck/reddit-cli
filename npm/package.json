@@ -1,0 +1,25 @@
+{
+  "name": "reddit-research",
+  "version": "0.1.0",
+  "description": "Installer for the native Reddit research CLI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Microck/reddit-cli.git",
+    "directory": "npm"
+  },
+  "bin": {
+    "reddit": "bin/reddit.cjs"
+  },
+  "files": ["bin", "lib"],
+  "scripts": {
+    "postinstall": "node lib/install.cjs"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,32 @@
+pkgname=reddit-research
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc="Read-only Reddit research CLI"
+arch=('x86_64' 'aarch64')
+url="https://github.com/Microck/reddit-cli"
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+makedepends=('cargo')
+source=("$url/releases/download/v$pkgver/$pkgname-v$pkgver-source.tar.gz")
+sha256sums=('@SHA256_SOURCE@')
+
+prepare() {
+  cd "$pkgname-$pkgver"
+  cargo fetch --locked
+}
+
+build() {
+  cd "$pkgname-$pkgver"
+  cargo build --frozen --release
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  cargo test --frozen
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 target/release/reddit "$pkgdir/usr/bin/reddit"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
