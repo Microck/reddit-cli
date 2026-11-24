@@ -1,4 +1,4 @@
-class RedditResearch < Formula
+class RedditCli < Formula
   desc "Read-only Reddit research CLI"
   homepage "https://github.com/Microck/reddit-cli"
   version "@VERSION@"

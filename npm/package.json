@@ -1,5 +1,5 @@
 {
-  "name": "reddit-research",
+  "name": "@microck/reddit-cli",
   "version": "0.1.0",
   "description": "Installer for the native Reddit research CLI",
   "license": "MIT",

@@ -10,7 +10,8 @@ let
   canExecute = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 in
 rustPlatform.buildRustPackage {
-  pname = cargoToml.package.name;
+  # Package name follows the project, not the crate (`reddit-cli` is taken on crates.io).
+  pname = "reddit-cli";
   version = cargoToml.package.version;
 
   src = lib.cleanSource ../.;

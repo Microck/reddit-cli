@@ -1,4 +1,4 @@
-pkgname=reddit-research
+pkgname=reddit-cli
 pkgver=@VERSION@
 pkgrel=1
 pkgdesc="Read-only Reddit research CLI"

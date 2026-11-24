@@ -11,7 +11,7 @@ subreddits, searches, reads full comment threads and looks up users through
 either the live Reddit API or the Arctic Shift archive, and keeps a local
 SQLite store that can be searched offline. It never posts, votes or writes to Reddit.
 
-- Project/repo: `reddit-cli`. Crate and npm package: `reddit-research` (`reddit-cli` is taken on both registries). Binary: `reddit`.
+- Project/repo: `reddit-cli`. crates.io crate: `reddit-cli` (`reddit-cli` is taken there); npm package: `@microck/reddit-cli` (unscoped name taken); Homebrew, Scoop, AUR and Nix use `reddit-cli`. Binary: `reddit`.
 - Rust edition 2024, toolchain pinned in `rust-toolchain.toml` to `1.98.0`.
 - Blocking I/O (`reqwest` blocking + native-tls, see 5.1). No async runtime. Use
   `std::thread::scope` for the few places that fan out (multi-sub search,

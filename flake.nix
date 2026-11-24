@@ -12,14 +12,14 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        reddit-research = pkgs.callPackage ./nix/reddit-research.nix { };
+        reddit-cli = pkgs.callPackage ./nix/reddit-cli.nix { };
       in
       {
         packages = {
-          inherit reddit-research;
-          default = reddit-research;
+          inherit reddit-cli;
+          default = reddit-cli;
         };
-        checks.reddit-research = reddit-research;
+        checks.reddit-cli = reddit-cli;
       }
     );
 }

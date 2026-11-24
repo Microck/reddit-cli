@@ -3,119 +3,113 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Microck/reddit-cli/releases"><img src="https://img.shields.io/github/v/release/Microck/reddit-cli?display_name=tag&style=flat-square&label=release&color=000000" alt="release badge"></a>
-  <a href="https://www.npmjs.com/package/reddit-research"><img src="https://img.shields.io/npm/dt/reddit-research?style=flat-square&label=downloads&color=000000" alt="npm downloads"></a>
-  <a href="https://github.com/Microck/reddit-cli/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Microck/reddit-cli/ci.yml?branch=main&style=flat-square&label=ci&color=000000" alt="ci badge"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-mit-000000?style=flat-square" alt="license badge"></a>
+  <a href="https://github.com/Microck/reddit-cli/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/release/Microck/reddit-cli.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/release/Microck/reddit-cli.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release"></picture></a>
+  <a href="https://www.npmjs.com/package/@microck/reddit-cli"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/npm/dt/@microck/reddit-cli.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/npm/dt/@microck/reddit-cli.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="npm total downloads"></picture></a>
+  <a href="https://github.com/Microck/reddit-cli/actions/workflows/ci.yml"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/Microck/reddit-cli.svg?workflow=ci.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/ci/Microck/reddit-cli.svg?workflow=ci.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="ci status"></picture></a>
+  <a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/license/Microck/reddit-cli.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/license/Microck/reddit-cli.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="license"></picture></a>
 </p>
 
 ---
 
 `reddit` is a read-only terminal cli for researching reddit. browse subreddits, search across several communities at once, read full comment threads with the hidden replies expanded, and look up users, through the live reddit api or the arctic shift archive when you have no api access. everything it fetches lands in a local store you can search offline. output is json when piped, so scripts, `jq` and agents read the same thing. `--format md` is for reading.
 
-[documentation](https://reddit.micr.dev/docs) | [npm](https://www.npmjs.com/package/reddit-research) | [github](https://github.com/Microck/reddit-cli)
+[documentation](https://reddit.micr.dev/docs) | [npm](https://www.npmjs.com/package/@microck/reddit-cli) | [github](https://github.com/Microck/reddit-cli)
 
 ## why
 
-Use `reddit` to browse subreddits, search posts and comments, read threads, and
-look up users from a terminal or script. The CLI has read-only access to Reddit
-and saves fetched posts and comments in a searchable local store.
+if you research things on reddit, from a terminal or through an agent, this cli gives you one read-only command surface for it. it never posts, votes or writes.
+
+- search one subreddit or several at once, merged and deduplicated, with top comments attached
+- read whole threads, including the replies reddit hides behind "load more"
+- fall back to the arctic shift archive when you have no api access, with date, author and comment-text filters
+- keep everything you fetched in a local sqlite store and search it offline
+- get stable json with a `{data, meta}` envelope and typed error codes
 
 ## quickstart
 
-| Channel | How to install |
-| --- | --- |
-| GitHub Releases | Download the archive for your OS and CPU. Verify it against the release's SHA-256 manifest, then extract `reddit` or `reddit.exe` to a directory on your `PATH`. [Releases](https://github.com/Microck/reddit-cli/releases) |
-| npm | Run `npm install -g reddit-research` with Node.js 18 or later. Postinstall downloads the matching release binary. |
-| crates.io | Run `cargo install reddit-research --locked`. |
-| Nix | Run `nix profile install github:Microck/reddit-cli`. |
-| Homebrew | Once a tap carries the rendered formula, run `brew install OWNER/TAP/reddit-research` with its tap name. [Formula template](packaging/homebrew/reddit-research.rb.template) |
-| Scoop | Fill in the release version and checksum in the template, save it as `reddit-research.json`, then run `scoop install .\reddit-research.json`. [Manifest template](packaging/scoop/reddit-research.json.template) |
-| Arch Linux | Fill in the release version and source checksum, then run `makepkg -si` in the directory with the `PKGBUILD`. [PKGBUILD](packaging/aur/PKGBUILD) |
+### using a package manager
 
-GitHub Releases and npm cover Linux with glibc and macOS on x64 and ARM64,
-plus Windows on x64.
+```bash
+npm install -g @microck/reddit-cli
+cargo install reddit-research --locked   # the crate name; reddit-cli is taken on crates.io
+```
 
-If npm requires approval for lifecycle scripts, install with
-`npm install -g --allow-scripts=reddit-research reddit-research`.
+if npm asks for approval to run lifecycle scripts:
 
-Try a listing from the archive without credentials.
+```bash
+npm install -g --allow-scripts=@microck/reddit-cli @microck/reddit-cli
+```
 
-```sh
+### nix / nixos
+
+```bash
+nix run github:Microck/reddit-cli -- --source archive sub rust
+nix profile install github:Microck/reddit-cli
+```
+
+### github releases
+
+download the archive for your os and cpu from [releases](https://github.com/Microck/reddit-cli/releases), check it against the sha-256 manifest, and put `reddit` (or `reddit.exe`) on your `PATH`. builds cover linux (glibc) and macos on x64 and arm64, plus windows on x64.
+
+homebrew, scoop and aur templates live in [packaging/](packaging/).
+
+### first run
+
+no credentials needed for the archive:
+
+```bash
 reddit --source archive sub rust --limit 5
 ```
 
 ## data sources
 
-| Source | Use it for |
+| source | use it for |
 | --- | --- |
-| `live` | The Reddit Data API with app-only OAuth. Use it for live subreddit rankings and Reddit's search. |
-| `archive` | Arctic Shift, a free third-party service that requires no credentials. Use it for comment search and date or author filters. |
-| `auto` | Select `live` when credentials resolve and `archive` otherwise. |
+| `live` | the reddit data api with app-only oauth. live rankings (hot, top, rising), reddit's own search, full threads. |
+| `archive` | arctic shift, a free third-party archive. no credentials. comment search, date and author filters. |
+| `auto` | the default. `live` when credentials resolve, `archive` otherwise. |
 
-Set the source with `--source`, `REDDIT_CLI_SOURCE`, or `source` in
-`config.toml`, in that order. The default is `auto`. A command uses the
-selected source for its entire run. If a request fails, you can select the other
-source with `--source`.
+set it with `--source`, `REDDIT_CLI_SOURCE`, or `source` in `config.toml`. the source is picked once per command and never switches silently; when one fails, the error hint names the other.
 
-Reddit is closing its public Data API. New access ended on October 31, 2026.
-Unregistered apps lose access on January 12, 2027, and all public access ends in
-March 2027. The archive uses a separate service. Its scores and comment counts
-are snapshots, and fields can be null when Arctic Shift has only the first
-capture. See the [backend support matrix](docs/spec.md#41-backend-support-matrix)
-for source-specific flags.
+reddit is closing its public data api. new access ended on 2026-10-31, unregistered apps lose access from 2027-01-12, and all public access ends in march 2027. after that, `--source archive` keeps working for as long as arctic shift does. archive scores and comment counts are captured at posting time and refreshed once about 36 hours later, so newer items show `null`. the [support matrix](docs/spec.md#41-backend-support-matrix) lists which flags each source supports.
 
 ## auth
 
-Live access uses app-only OAuth with a Reddit app's client credentials.
-Set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` in the environment. You can
-also set `REDDIT_USER_AGENT`. The CLI checks the environment before the
-`[auth]` section of `config.toml` for each field.
+live access uses app-only oauth with your reddit app's client id and secret. the archive needs nothing.
 
-To save and verify credentials, run the command below and enter the secret at
-the hidden prompt. For scripted login, pass `--client-secret-stdin` and supply
-the secret on standard input.
-
-```sh
-reddit auth login --client-id YOUR_CLIENT_ID
+```bash
+reddit auth login --client-id YOUR_CLIENT_ID   # prompts for the secret without echo
 reddit auth status
 ```
 
-Use `reddit auth logout` to sign out. The archive does not use Reddit
-credentials.
+for scripts, pass `--client-secret-stdin` and pipe the secret in. you can also set `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET` and `REDDIT_USER_AGENT`, the same variables reddit-mcp-buddy reads; the environment wins over `config.toml` field by field. `reddit auth logout` removes saved credentials.
 
 ## command surface
 
-| Command | What it does |
+| command | what it does |
 | --- | --- |
-| `reddit sub NAME` | Lists subreddit posts. Use `--sort new` with the archive. |
-| `reddit about NAME` | Shows subreddit details. |
-| `reddit search QUERY` | Searches posts, comments, subreddits, or users via `--type posts\|comments\|subs\|users`. Repeat `--sub` to search several subreddits. Archive post and comment searches require `--sub` or `--author`. |
-| `reddit thread URL_OR_ID` | Reads a post and its comment tree. Use `--comment ID` to focus on a comment or `-o FILE` to save the output. On live, `--full` expands hidden replies up to `--max-requests`. |
-| `reddit user NAME` | Shows a user overview by default. Use `--posts` or `--comments` for one kind of activity. |
-| `reddit cache search FTS_QUERY` | Searches locally stored posts and comments with SQLite FTS5. |
-| `reddit cache stats\|prune\|clear` | Inspects or manages the local store. |
-| `reddit auth status\|login\|logout` | Inspects or manages live credentials. |
-| `reddit skills list\|get NAME` | Lists embedded skills or prints a named skill. |
-| `reddit completions SHELL` | Prints a shell completion script. |
+| `reddit sub NAME` | list a subreddit's posts. defaults to `hot` on live and `new` on the archive. |
+| `reddit about NAME` | show subreddit details. |
+| `reddit search QUERY` | search posts, comments, subreddits or users with `--type`. repeat `--sub` to search several subreddits; add `--comments K` to attach top comments. archive post and comment search needs `--sub` or `--author`. |
+| `reddit thread URL_OR_ID` | read a post and its comments. `--comment ID` focuses one comment, `-o FILE` saves it. on live, `--full` loads hidden replies up to `--max-requests`. |
+| `reddit user NAME` | show a user's profile and recent activity. `--posts` or `--comments` for one kind. |
+| `reddit cache search QUERY` | full-text search over everything stored locally. |
+| `reddit cache stats\|prune\|clear` | inspect or clean the local store. |
+| `reddit auth status\|login\|logout` | manage live credentials. |
+| `reddit skills list\|get NAME` | print the embedded agent skill. |
+| `reddit completions SHELL` | print a shell completion script. |
 
-Use `reddit COMMAND --help` for flags. Listing limits go up to 1000. Pass
-`meta.after` back as `--after` with the same source to resume a listing.
-For multi-subreddit searches, omit `--after`. Date filters accept dates,
-RFC3339 timestamps, epoch seconds, and relative values such as `30d`.
+run `reddit COMMAND --help` for every flag. listings go up to 1000 items; pass `meta.after` back as `--after` to page. dates accept `YYYY-MM-DD`, rfc3339, epoch seconds, or relative values like `30d`.
 
-## output formats and the JSON envelope
+## output
 
-| Format | Output |
+| format | output |
 | --- | --- |
-| `auto` | Pretty output in a terminal and JSON when stdout is redirected or piped. |
-| `json` | One object with `data` and `meta` on stdout. |
-| `jsonl` | One item per line for lists. Threads emit the post first, then comments in tree order with `depth`. Other payloads use the JSON envelope on one line. |
-| `md` | Markdown for reading or passing to a model. |
-| `pretty` | Human-readable terminal output. Its layout can change. |
-
-Set the format with `--format` or `REDDIT_CLI_FORMAT`. A JSON response for
-an empty search can look like this.
+| `auto` | `pretty` in a terminal, `json` when piped. |
+| `json` | one `{data, meta}` object on stdout. |
+| `jsonl` | one item per line, no envelope. threads print the post, then comments in tree order with `depth`. |
+| `md` | compact markdown for reading or handing to a model. |
+| `pretty` | human terminal output; its layout can change. |
 
 ```json
 {
@@ -130,43 +124,28 @@ an empty search can look like this.
 }
 ```
 
-Check `meta.notes` for source caveats and partial multi-subreddit failures.
-Errors go to stderr. With `json` or `jsonl`, stderr carries an `error` object
-with a stable code, retry information, and a hint when available.
-[Output and error contract](docs/spec.md#7-output-contract)
+read `meta.notes` for source caveats and partial results. errors go to stderr; with `json` or `jsonl` they are an `{"error": {...}}` object with a stable code, a retry hint and a distinct exit code. the full contract is in [docs/spec.md](docs/spec.md#7-output-contract).
 
 ## local store
 
-The CLI saves HTTP responses and fetched posts and comments in a local SQLite
-database. The default retention is `30d`. Set `retention` under `[store]` in
-`config.toml` to change it. The CLI prunes old entries when it opens the store,
-at most once per hour. A fresh fetch that marks an item as deleted or removed
-replaces its stored text with the corresponding marker.
+fetched posts, comments and http responses go into a local sqlite database. entries older than 30 days are pruned automatically; change it with `retention` under `[store]` in `config.toml`. when a fetch shows an item was deleted or removed, its stored text is replaced with the marker and never comes back.
 
-Use `--offline` to read from the store without network requests, even after the
-normal cache TTL expires. Use `--refresh` to bypass cache reads while still
-saving fresh results, or `--no-cache` to skip cache reads and writes.
+- `--offline` reads only from the store, ignoring cache expiry
+- `--refresh` skips cache reads but still saves
+- `--no-cache` skips the store entirely
+- `reddit cache prune --older-than 7d` and `reddit cache clear` clean it up
 
-Run `reddit cache prune --older-than 7d` to remove older entries. Run
-`reddit cache clear` to delete the database and cached OAuth token.
-`REDDIT_CLI_CONFIG_DIR` and `REDDIT_CLI_DATA_DIR` override the default
-platform directories.
+`REDDIT_CLI_CONFIG_DIR` and `REDDIT_CLI_DATA_DIR` override the default directories.
 
 ## agent usage
 
-Run `reddit skills list` to find the embedded usage guides. Run
-`reddit skills get NAME` to print one, or read the [command index](llms.txt)
-for flags, output fields, and error codes.
+`reddit skills get reddit-cli` prints a short guide for agents: the research loop, how to read the output, and the gotchas. [llms.txt](llms.txt) indexes every command, flag, field and error code.
 
-In scripts, request `--format json`, parse stdout, and check the exit code
-before reading `data`. Use `--quiet` to suppress progress and notes on stderr.
+in scripts, use `--format json`, check the exit code, then read `data`. `--quiet` silences notes on stderr.
 
 ## shell completion
 
-Generate a script for your shell and install it in the shell's completion
-directory.
-
-```sh
+```bash
 reddit completions bash > reddit.bash
 reddit completions zsh > _reddit
 reddit completions fish > reddit.fish
@@ -174,26 +153,25 @@ reddit completions fish > reddit.fish
 
 ## examples
 
-```sh
-# Search archived posts in two subreddits.
-reddit --source archive search 'embedded Rust' -s rust -s embedded --since 30d --rank new
+```bash
+# search three subreddits, rank by score, attach two top comments to each hit
+reddit search "async runtime" -s rust -s golang -s programming --rank score --comments 2
 
-# Search archived comments and stream one result per line.
-reddit --source archive --format jsonl search 'borrow checker' --type comments -s rust
+# read a whole thread, hidden replies included, as markdown
+reddit thread https://www.reddit.com/r/rust/comments/1abc23/ --full --format md
 
-# Save a thread to Markdown using a post ID.
-reddit --source archive thread 1abc23 --sort top -o thread.md
+# archived comments from the last 30 days, one per line
+reddit --source archive --format jsonl search "borrow checker" --type comments -s rust --since 30d
 
-# Search posts already in the local store.
+# search what you already fetched, without network
 reddit cache search '"borrow checker"' --sub rust --kind post
 ```
 
 ## building from source
 
-Install Rust through rustup so Cargo uses the version in
-`rust-toolchain.toml`.
+install rust with rustup so cargo picks up the version in `rust-toolchain.toml`.
 
-```sh
+```bash
 git clone https://github.com/Microck/reddit-cli.git
 cd reddit-cli
 cargo install --path . --locked
@@ -201,8 +179,8 @@ cargo install --path . --locked
 
 ## license
 
-[MIT](LICENSE).
+[mit](LICENSE)
 
 ## disclaimer
 
-reddit-cli is an independent project. It is not affiliated with Reddit.
+reddit-cli is an independent project and is not affiliated with reddit.

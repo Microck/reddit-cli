@@ -34,7 +34,7 @@ export default function Home() {
         </h1>
         <p className="mt-6 text-xl text-fd-foreground">research reddit from the terminal with a read-only cli.</p>
         <pre className="mt-8 w-fit max-w-full overflow-x-auto rounded-lg border bg-fd-card px-4 py-3">
-          <code>npm install -g reddit-research</code>
+          <code>npm install -g @microck/reddit-cli</code>
         </pre>
         <Link href="/docs/" className="mt-5 inline-block font-medium text-fd-primary underline underline-offset-4">
           read the docs
