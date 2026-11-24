@@ -1,60 +1,83 @@
 ---
-title: local store
-description: find saved posts and comments and manage local retention.
+title: Local store
+description: Storage paths, search, cache flags, and retention.
 ---
 
-the cli saves http responses and indexes posts and comments in sqlite.
-`reddit cache search` uses sqlite fts5 over title, body, author, and
-subreddit, ranked by `bm25`. you can filter by subreddit, author, or kind.
+The CLI saves HTTP responses and indexes posts and comments in SQLite.
 
-## paths
+## Paths
 
-the platform config and data directories each contain a `reddit-cli/`
-subdirectory. on linux these are typically `~/.config/reddit-cli/` and
-`~/.local/share/reddit-cli/`, or the corresponding xdg locations.
+The platform config and data directories each contain a `reddit-cli/` subdirectory.
+On Linux, the default paths are `~/.config/reddit-cli/` and `~/.local/share/reddit-cli/`.
+If you set XDG paths, the CLI uses the corresponding directories.
 
-| file | directory override |
+| File | Directory override |
 | --- | --- |
 | `config.toml` | `REDDIT_CLI_CONFIG_DIR` |
-| `store.sqlite`, `token.json` | `REDDIT_CLI_DATA_DIR` |
+| `store.sqlite` and `token.json` | `REDDIT_CLI_DATA_DIR` |
 
-each override is the directory that holds the files directly. on unix the
-cli creates or tightens these directories to mode `0700`.
+Each override names the directory that holds the files. On Unix, the CLI sets both directories to mode `0700`.
 
-## cache flags and expiration
+## Credentials and tokens
 
-| option | behavior |
+The live source uses the OAuth `client_credentials` grant.
+`reddit auth login` saves credentials to `config.toml` and requests a token to verify access.
+The CLI caches the token in `token.json`. On Unix, the CLI sets both files to mode `0600`.
+
+The CLI resolves each field separately. Environment variables take precedence over `config.toml`.
+The CLI treats empty values and unresolved placeholders as unset.
+
+| Environment variable | Field in `[auth]` in `config.toml` |
 | --- | --- |
-| `--offline` | uses cached responses without network requests, even after their ttl. a miss is `E_OFFLINE_MISS`. |
-| `--refresh` | skips cache reads and writes fresh results to the cache. |
-| `--no-cache` | skips reads and writes, including writes to the item index. |
+| `REDDIT_CLIENT_ID` | `client_id` |
+| `REDDIT_CLIENT_SECRET` | `client_secret` |
+| `REDDIT_USER_AGENT` | `user_agent` |
 
-http responses expire after 5 minutes for live listings and search, 10
-minutes for live threads, 15 minutes for live about and user responses, and
-60 minutes for archive responses. `cache search` searches the local item
-index. it does not rerun the upstream query.
+The default user agent has the form `<os>:reddit-cli:<version> (+https://github.com/Microck/reddit-cli)`.
+`reddit auth status` reports where each field comes from and keeps credential values private.
 
-## retention and deletion
+The CLI treats a token as expired 60 seconds before its expiration time.
+If a request to the live source returns HTTP 401, the CLI refreshes the token once and retries the request.
 
-the default retention is `30d`. set `retention` under `[store]` in
-`config.toml` to change it. when the store opens, the cli removes older
-responses and items at most once per hour.
+## Cache flags
 
-when a fetch shows a post or comment as deleted or removed, the cli replaces
-the stored text with that marker. a later fetch, including one from the
-archive, cannot restore text over a stored marker. the first marker also
-invalidates cached responses containing the item's fullname.
+| Flag | Behavior |
+| --- | --- |
+| `--offline` | The CLI serves only cached responses, even after they expire. A cache miss returns `E_OFFLINE_MISS`. |
+| `--refresh` | The CLI skips cache reads and writes fresh results to the cache. |
+| `--no-cache` | The CLI skips cache reads and writes. The CLI also skips writes to the item index. |
 
-## manage the cache
+## HTTP response expiration
 
-```sh
-reddit cache search '"borrow checker"' --sub rust --kind post
-reddit cache stats
-reddit cache prune --older-than 7d
-```
+| Response | Expiration |
+| --- | --- |
+| Listings and search from the live source | 5 minutes |
+| Threads from the live source | 10 minutes |
+| `about` and `user` from the live source | 15 minutes |
+| Responses from the archive source | 60 minutes |
 
-`cache prune` uses configured retention if you omit `--older-than`.
-`cache clear` deletes the local database and cached oauth token. if another
-process holds the store lock, it exits with `E_CONFIG`. use `cache clear`
-to recover from `E_STORE_SCHEMA` after deciding you can discard the old
-store.
+## Local search
+
+`reddit cache search` searches the local item index without a network request.
+SQLite FTS5 indexes titles, bodies, authors, and subreddits and ranks matches with `bm25`.
+The command accepts filters by subreddit, author, and item kind.
+
+## Retention and deletion
+
+The setting `retention` under `[store]` in `config.toml` defaults to `30d`.
+When the CLI opens the local store, the CLI removes responses and items older than the retention period at most once per hour.
+
+If a source reports a post or comment as deleted or removed, the CLI replaces the stored text with the corresponding marker.
+The marker prevents a later request to either source from restoring the text.
+When the CLI first writes the marker, the CLI invalidates cached responses that contain the item's fullname.
+
+## Cache commands
+
+| Command | Result |
+| --- | --- |
+| `reddit cache search '"borrow checker"' --sub rust --kind post` | Searches saved posts in `r/rust` for the phrase `borrow checker`. |
+| `reddit cache stats` | Reports the counts of cached responses and stored items. |
+| `reddit cache prune --older-than 7d` | Deletes cached responses and stored items older than seven days. Without `--older-than`, the CLI uses the configured retention. |
+| `reddit cache clear` | Deletes the local database and cached OAuth token. If another process holds the store lock, the CLI exits with `E_CONFIG`. |
+
+After an `E_STORE_SCHEMA` error, `reddit cache clear` discards the incompatible local store so the CLI can create a new one.

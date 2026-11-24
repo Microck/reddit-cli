@@ -1,77 +1,109 @@
 ---
-title: research workflows
-description: find discussions, read them in context, and revisit them offline.
+title: Research workflows
+description: Find discussions, read threads, and revisit results offline.
 ---
 
-## search several subreddits
+## Search several subreddits
 
-this searches two communities for posts and attaches up to three top-level
-comments to each hit. `--rank new` orders the merged results by date.
+1. To search two subreddits, pass `--sub` for each subreddit.
+2. To sort the combined results by date, pass `--rank new`.
+3. To attach up to three top-level comments to each post, pass `--comments 3`.
+4. Run the search and save the results.
 
-```sh
-reddit --source archive --format json search 'embedded rust' \
-  --sub rust --sub embedded --limit 10 --rank new --comments 3 > results.json
-jq '.data[] | {title, permalink, top_comments}' results.json
-jq '.meta.notes' results.json
-```
+   ```sh
+   reddit --source archive --format json search 'embedded rust' \
+     --sub rust --sub embedded --limit 10 --rank new --comments 3 > results.json
+   ```
 
-each subreddit gets its own search. the cli deduplicates posts and
-crossposts before applying the final limit. if one subreddit fails, its
-error appears in `meta.notes`. if a post's comment fetch fails,
-`top_comments` is empty and a note records the failure. omit `--after`
-when you pass more than one `--sub`.
+5. Read the titles, permalinks, and top-level comments.
 
-## read a thread with hidden replies
+   ```sh
+   jq '.data[] | {title, permalink, top_comments}' results.json
+   ```
 
-with [live credentials](/docs/auth/) configured, paste a canonical thread
-url or use the post id from a search result. replace `POST_ID` below.
+6. To check for partial results, read `meta.notes`.
 
-```sh
-reddit --source live --format json thread POST_ID --full > thread.json
-jq '.data | {complete, comments_returned, unresolved}' thread.json
+   ```sh
+   jq '.meta.notes' results.json
+   ```
 
-reddit --source live thread POST_ID --full -o thread.md
-```
+When you pass more than one `--sub`, omit `--after`.
+If the selected source fails, read the error hint. If the other source supports the request, rerun with a different `--source`.
 
-`--full` asks the live api for collapsed replies. the default budget is 50
-requests. inspect `data.complete` and `data.unresolved` to see what you got.
-a depth or comment limit can also leave the tree incomplete. if you use the
-archive, you can omit `--full` because the archive endpoint returns a tree
-directly.
+## Read a thread with hidden replies
 
-if you have a reddit share url containing `/s/`, open it in a browser and
-copy the canonical thread url. a thread url with a comment id focuses the
-thread on that comment. you can also pass `--comment ID`.
+1. Set up [credentials for the live source](/docs/auth/).
+2. Replace `POST_ID` with a canonical thread URL or a post ID from your search results.
+3. To expand hidden replies, run `thread` with `--full`.
 
-## search archived comments by date
+   ```sh
+   reddit --source live --format json thread POST_ID --full > thread.json
+   ```
 
-```sh
-reddit --source archive --format jsonl search 'borrow checker' \
-  --type comments --sub rust --since 2025-01-01 --until 2025-06-30
-```
+4. To check for incomplete results, read `data.complete` and `data.unresolved`.
 
-archive post and comment searches require `--sub` or `--author`. dates
-accept `YYYY-MM-DD`, rfc3339, epoch seconds, or relative values such as
-`30d`, `12h`, `6m` (months), and `1y`.
+   ```sh
+   jq '.data | {complete, comments_returned, unresolved}' thread.json
+   ```
 
-## revisit results offline
+5. To save the thread as Markdown, pass `-o thread.md`.
+
+   ```sh
+   reddit --source live thread POST_ID --full -o thread.md
+   ```
+
+For the archive source, omit `--full`.
+
+## Read a thread from a share URL
+
+1. If your Reddit share URL contains `/s/`, open the URL in a browser.
+2. Copy the canonical thread URL from the browser.
+3. Run `reddit thread` with the canonical URL.
+
+To focus on a comment, use a thread URL that includes the comment ID or pass `--comment ID`.
+
+## Search archived comments by date
+
+1. To search comment text, select the archive source and pass `--type comments`.
+2. To scope the search, pass `--sub` or `--author`.
+3. To limit the search by date, pass `--since` and `--until`.
+
+   ```sh
+   reddit --source archive --format jsonl search 'borrow checker' \
+     --type comments --sub rust --since 2025-01-01 --until 2025-06-30
+   ```
+
+If the search times out, narrow the date range or add a subreddit or author filter.
+For supported date values, see [Search ranking and date filters](/docs/sources/#search-ranking-and-date-filters).
+
+## Revisit results offline
+
+To search the text of posts and comments in the local store, run `reddit cache search`.
 
 ```sh
 reddit cache search '"borrow checker"' --sub rust --kind comment --limit 10
 ```
 
-`cache search` searches the text of posts and comments that commands
-already saved. use `--offline` to rerun a previously cached request without
-a network call. see [local store](/docs/store/) for the difference.
+To rerun a request that has a cached response, pass `--offline`.
+For the differences between the two commands, see [Cache flags](/docs/store/#cache-flags).
 
-## give an agent the cli instructions
+## Give an agent the CLI instructions
 
-```sh
-reddit skills list
-reddit --format md skills get reddit-cli
-```
+1. List the available skills.
 
-give the printed skill to an agent that can run `reddit`. request
-`--format json` for research commands, check the exit code and
-`meta.notes`, and cite the `permalink` of the post or comment you quote.
-the site also publishes a [plain-text docs index](/llms.txt).
+   ```sh
+   reddit skills list
+   ```
+
+2. Print the Reddit research skill as Markdown.
+
+   ```sh
+   reddit --format md skills get reddit-cli
+   ```
+
+3. Give the printed skill to an agent that can run `reddit`.
+4. Request `--format json` for research commands.
+5. Check the exit code and `meta.notes` for failures and partial results.
+6. For each quote, cite the post or comment URL in `permalink`.
+
+For a list of docs pages, see the [plain-text docs index](/llms.txt).

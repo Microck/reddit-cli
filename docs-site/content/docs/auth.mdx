@@ -1,53 +1,40 @@
 ---
-title: authentication
-description: configure app-only oauth for the live reddit api.
+title: Authentication
+description: Set up app-only OAuth for the live source.
 ---
 
-the live api uses the oauth `client_credentials` grant. use a reddit
-application with data api access. you can use the archive without credentials.
-see [sources](/docs/sources/) for the data api shutdown dates.
+## Save credentials for the live source
 
-## save credentials
+1. Use a Reddit app with Data API access. See the [access dates](/docs/sources/#reddit-data-api-access-ends-in-march-2027).
+2. Replace `YOUR_CLIENT_ID` with the app's client ID.
+3. Run the login command.
 
-```sh
-reddit auth login --client-id YOUR_CLIENT_ID
-reddit auth status
-```
+   ```sh
+   reddit auth login --client-id YOUR_CLIENT_ID
+   ```
 
-enter the secret at the hidden prompt. for scripted login, pass
-`--client-secret-stdin` and supply the secret on standard input. use
-`--user-agent` to set a custom user agent. login writes the config, requests a
-token to verify access, and reports `ok`, `scope`, and `expires_in`.
+4. Enter the client secret at the hidden prompt.
+5. Check `ok`, `scope`, and `expires_in` in the login result to verify access.
 
-## use environment variables
+For scripted login, pass `--client-secret-stdin`. Supply the client secret on standard input.
+To set a custom user agent, pass `--user-agent`.
 
-| environment variable | fallback in `config.toml` |
-| --- | --- |
-| `REDDIT_CLIENT_ID` | `[auth]` `client_id` |
-| `REDDIT_CLIENT_SECRET` | `[auth]` `client_secret` |
-| `REDDIT_USER_AGENT` | `[auth]` `user_agent` |
+## Use credentials from environment variables
 
-the cli resolves each field separately. environment values take precedence over
-the config file. empty values and unresolved placeholders count as unset.
-the default user agent follows
-`<os>:reddit-cli:<version> (+https://github.com/Microck/reddit-cli)`.
+1. Set `REDDIT_CLIENT_ID` to the app's client ID.
+2. Set `REDDIT_CLIENT_SECRET` to the app's client secret.
+3. For a custom user agent, set `REDDIT_USER_AGENT`.
+4. To check which values the CLI resolves, run `reddit auth status`.
 
-`reddit auth status` reports each field's origin (`env`, `config`, or
-`unset`), the resolved source, whether the cached token is valid, and the last
-rate-limit state. it keeps credential values private.
+## Check credentials and live access
 
-## local files and logout
+1. Run `reddit auth status`.
+2. Check each field's origin for `env`, `config`, or `unset`.
+3. Check the resolved source, cached token validity, and last rate-limit state.
 
-`config.toml` lives in the platform config directory under `reddit-cli/`.
-the cached token lives in `token.json` under the platform data directory.
-see [local store](/docs/store/#paths) for the directory overrides. on unix,
-the cli uses mode `0600` for these files and `0700` for their directories.
-it treats tokens as expired 60 seconds early and refreshes the token once
-if a live request returns http 401.
+For credential precedence, file permissions, and token rules, see [Credentials and tokens](/docs/store/#credentials-and-tokens).
 
-```sh
-reddit auth logout
-```
+## Remove credentials
 
-logout removes the saved credentials and cached token. if you set credentials
-through the environment, clear those variables in your shell too.
+1. Run `reddit auth logout` to remove the saved credentials and cached token.
+2. If you set credentials in your shell, clear those environment variables.

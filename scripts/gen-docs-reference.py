@@ -32,18 +32,19 @@ def help_pages(binary, command=()):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("binary", type=Path, help="path to the built reddit binary")
+    parser.add_argument("binary", type=Path, help="Path to the built reddit binary.")
     binary = parser.parse_args().binary.resolve()
     pages = {}
 
     for command, help_text in help_pages(binary):
-        title = " ".join(command) if command else "global flags"
+        invocation = " ".join(("reddit", *command))
+        title = invocation if command else "Global flags"
         slug = "-".join(command) if command else "global-flags"
-        intro = help_text.splitlines()[0]
+        description = f"Usage and options for {invocation}."
         fence = "`" * max(3, 1 + max(map(len, re.findall(r"`+", help_text)), default=0))
         pages[slug] = (
-            f"---\ntitle: {json.dumps(title)}\ndescription: {json.dumps(intro)}\n---\n"
-            f"\n{GENERATED}\n\n{intro}\n\n{fence}text\n{help_text}\n{fence}\n"
+            f"---\ntitle: {json.dumps(title)}\ndescription: {json.dumps(description)}\n---\n"
+            f"\n{GENERATED}\n\n## `{invocation} --help`\n\n{fence}text\n{help_text}\n{fence}\n"
         )
 
     REFERENCE.mkdir(parents=True, exist_ok=True)
@@ -52,7 +53,7 @@ def main():
             path.unlink()
     for slug, content in pages.items():
         (REFERENCE / f"{slug}.mdx").write_text(content, encoding="utf-8")
-    meta = {"title": "command reference", "pages": ["index", *pages]}
+    meta = {"title": "Command reference", "pages": ["index", *pages]}
     (REFERENCE / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(pages)} reference pages")
 

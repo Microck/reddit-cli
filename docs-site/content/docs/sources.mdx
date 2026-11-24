@@ -1,64 +1,84 @@
 ---
-title: data sources
-description: choose the live reddit api or the arctic shift archive.
+title: Data sources
+description: How the live source and the archive source differ.
 ---
 
-| source | access | use it for |
+## Why the CLI has two sources
+
+The live source uses app-only OAuth and the Reddit Data API to return current listings and scores.
+The live source supports Reddit search and can expand hidden replies in threads.
+The archive source uses Arctic Shift, an independent service that requires no credentials.
+The archive source supports historical posts, comment text search, and filters by date or author.
+
+## Reddit Data API access ends in March 2027
+
+October 31, 2026 is the cutoff for new public Data API access.
+Unregistered apps lose access starting January 12, 2027.
+All public access ends in March 2027.
+Arctic Shift operates separately from the Reddit Data API.
+
+[Project spec](https://github.com/Microck/reddit-cli/blob/main/docs/spec.md#2-backends)
+
+## Source selection
+
+The CLI selects one source before the first request. The selection follows this order of precedence.
+
+1. The `--source` flag.
+2. The `REDDIT_CLI_SOURCE` environment variable.
+3. The top-level `source` setting in `config.toml`.
+4. The default, `auto`.
+
+| Value | Source |
+| --- | --- |
+| `live` | Reddit Data API with app-only OAuth. |
+| `archive` | Arctic Shift without credentials. |
+| `auto` | The live source when credentials resolve, or the archive source otherwise. |
+
+The CLI keeps the selected source for the entire command.
+If a request fails, the error hint names the other source.
+The `auth`, `cache`, and `skills` commands ignore `--source`.
+
+## Backend support matrix
+
+When the selected source does not support a command or flag, the CLI returns `E_UNSUPPORTED` before any request.
+
+| Command or flag | Live source | Archive source |
 | --- | --- | --- |
-| `live` | reddit data api with app-only oauth | current listings and scores, reddit search, and expanding hidden replies in live threads |
-| `archive` | arctic shift, a third-party archive that requires no credentials | historical posts, comment text search, and date or author filters |
-| `auto` | selects `live` when credentials resolve and `archive` otherwise | a default based on your local configuration |
-
-## select a source
-
-`--source` takes precedence over `REDDIT_CLI_SOURCE`, then the top-level
-`source` setting in `config.toml`. the default is `auto`. the cli selects
-the source once before a request. if the source fails, read the hint and
-rerun with a different `--source` when that source supports the request.
-`auth`, `cache`, and `skills` ignore `--source`.
-
-## reddit data api shutdown
-
-reddit stopped accepting new public data api access on october 31, 2026.
-unregistered apps lose access starting january 12, 2027. all public access
-ends in march 2027. the arctic shift archive uses a separate service.
-[project spec](https://github.com/Microck/reddit-cli/blob/main/docs/spec.md#2-backends)
-
-## backend support matrix
-
-unsupported combinations return `E_UNSUPPORTED` before a request.
-the table shows supported options and the endpoints each source uses.
-
-| command or flag | live | archive |
-| --- | --- | --- |
-| `sub --sort hot/rising/controversial/top` | yes | no |
-| `sub --sort new` | yes | `/posts/search?subreddit=&sort=desc` |
-| `sub --time` | yes | no |
-| `about` | `/r/S/about` | `/subreddits/search?subreddit=S`. first exact match or `E_NOT_FOUND`. |
-| `search --type posts` | `/search` or `/r/S/search` | `/posts/search?query=`. requires `--sub` or `--author`. |
-| `search --type comments` | no | `/comments/search?body=`. requires `--sub` or `--author`. |
-| `search --type subs` | `/subreddits/search?q=` | `/subreddits/search?subreddit_prefix=&sort_type=subscribers`. one page. |
-| `search --type users` | `/users/search?q=` | `/users/search?author_prefix=&sort_type=total_karma`. one page. |
-| `search --author/--since/--until` | no | yes |
-| `search --sort` | all values | `new` descending. treats `relevance` as `new`. |
-| `search --time` | yes | no. use `--since` and `--until`. |
-| `search --comments K` (up to 100) | yes | fetches roots via `/comments/search?link_id=&parent_id=`, up to five pages per post, and sorts by score locally. a note reports truncation at the cap. |
+| `sub --sort` with `hot`, `rising`, `controversial`, or `top` | Supported | Unsupported |
+| `sub --sort new` | Supported | `/posts/search?subreddit=&sort=desc` |
+| `sub --time` | Supported | Unsupported |
+| `about` | `/r/S/about` | `/subreddits/search?subreddit=S`. The CLI returns the first exact match or `E_NOT_FOUND`. |
+| `search --type posts` | `/search` or `/r/S/search` | `/posts/search?query=`. The CLI requires `--sub` or `--author`. |
+| `search --type comments` | Unsupported | `/comments/search?body=`. The CLI requires `--sub` or `--author`. |
+| `search --type subs` | `/subreddits/search?q=` | `/subreddits/search?subreddit_prefix=&sort_type=subscribers`. The CLI returns one page. |
+| `search --type users` | `/users/search?q=` | `/users/search?author_prefix=&sort_type=total_karma`. The CLI returns one page. |
+| `search` with `--author`, `--since`, or `--until` | Unsupported | Supported |
+| `search --sort` | All values | The CLI accepts `new` and `relevance`. Both sort from newest to oldest. |
+| `search --time` | Supported | Unsupported. The date filters are `--since` and `--until`. |
+| `search --comments K` with up to 100 comments | Supported | The CLI fetches top-level comments via `/comments/search?link_id=&parent_id=`. The CLI fetches up to five pages per post and sorts by score locally. A note reports truncation at the cap. |
 | `thread` | `/comments/ID` and `/api/morechildren` | `/posts/ids?ids=` and `/comments/tree?link_id=t3_ID&limit=9999` |
-| `thread --sort/--depth/--limit` | yes | fetches the tree with `limit=9999`, then applies `top`, `new`, or `old` sort and depth and limit locally. pruning sets `complete` to false and adds a note with the count dropped. |
-| `thread --full/--max-requests` | yes | the cli fetches the archive tree without expansion and adds a note if you pass either flag. |
-| `user` overview, posts, or comments | `/user/U/about` and a listing | `/users/search?author=U` and `/posts/search?author=` or `/comments/search?author=`. overview merges activity by time. |
-| `user --sort hot/top/controversial` and `--time` | yes | no |
-| `user --since/--until` | no | yes |
+| `thread` with `--sort`, `--depth`, or `--limit` | Supported | The CLI fetches the tree with `limit=9999`. The CLI applies `top`, `new`, or `old` sort and both limits locally. If either limit removes comments, the CLI sets `complete` to `false` and reports the count in a note. |
+| `thread` with `--full` or `--max-requests` | Supported. The default budget for `--full` is 50 requests. | The CLI fetches the tree directly. If you pass either flag, the CLI ignores the flag and adds a note. |
+| `user` overview, posts, or comments | `/user/U/about` and a listing | `/users/search?author=U` and `/posts/search?author=` or `/comments/search?author=`. The overview merges activity by time. |
+| `user --sort` with `hot`, `top`, or `controversial`, or `user --time` | Supported | Unsupported |
+| `user` with `--since` or `--until` | Unsupported | Supported |
 
-live threads default to `confidence` sort. archive threads default to `top`.
+Threads default to `confidence` on the live source and `top` on the archive source.
 
-## archive caveats
+## Search ranking and date filters
 
-arctic shift captures scores and comment counts at posting time and refreshes
-them once about 36 hours later. when its second-capture marker is absent,
-the cli reports `score`, `num_comments`, and `upvote_ratio` as `null`.
+When you repeat `--sub`, the CLI searches each subreddit separately.
+The CLI deduplicates posts and crossposts before applying the final limit.
+For merged results, `--rank new` sorts from newest to oldest.
 
-post search uses a simple keyword match. comment search uses postgres
-full-text search with `websearch_to_tsquery` syntax. if a busy subreddit or
-user times out, narrow the dates or add a subreddit or author filter.
-archive caveats appear in `meta.notes`.
+The date filters accept `YYYY-MM-DD`, RFC 3339, epoch seconds, and relative values.
+The values `30d`, `12h`, `6m`, and `1y` mean 30 days, 12 hours, six months, and one year, respectively.
+
+## Archive data limits
+
+Arctic Shift records scores and comment counts when a post appears and refreshes those values once, about 36 hours later.
+Without the marker for the second capture, the CLI reports `score`, `num_comments`, and `upvote_ratio` as `null`.
+
+Post search uses a keyword match. Comment search uses PostgreSQL full-text search with `websearch_to_tsquery` syntax.
+A search of a very active subreddit or user can time out.
+The CLI reports the archive source's limits in `meta.notes`.

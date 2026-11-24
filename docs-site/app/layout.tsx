@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://reddit.micr.dev'),
   title: { default: 'reddit-cli', template: '%s | reddit-cli' },
-  description: 'Research Reddit from the terminal with the live API, the Arctic Shift archive, or your local store.',
+  description: 'Research Reddit from the terminal with the live source, the Arctic Shift archive, or your local store.',
 };
 
 export default function Layout({ children }: { children: ReactNode }) {

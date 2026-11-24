@@ -1,45 +1,68 @@
 ---
-title: install
-description: install the reddit binary on linux, macos, or windows.
+title: Install
+description: Install the reddit binary on Linux, macOS, or Windows.
 ---
 
-## npm
+## Install with npm
 
-use node.js 18 or later. the postinstall step downloads the release binary
-for your platform.
+1. Use Node.js 18 or later.
+2. Run the install command to let npm download the release binary for your platform.
 
-```sh
-npm install -g @microck/reddit-cli
-```
+   ```sh
+   npm install -g @microck/reddit-cli
+   ```
 
-if npm requires approval for lifecycle scripts, use
-`npm install -g --allow-scripts=@microck/reddit-cli @microck/reddit-cli`.
+   If npm requires approval for lifecycle scripts, run the command with explicit approval for the package.
 
-## release binary
+   ```sh
+   npm install -g --allow-scripts=@microck/reddit-cli @microck/reddit-cli
+   ```
 
-download the archive for your os and cpu. verify its sha-256 against the
-release's checksum manifest, then extract `reddit` or `reddit.exe` to a
-directory on your `PATH`. npm and the release archives cover linux with glibc
-and macos on x64 and arm64, plus windows on x64.
-[github releases](https://github.com/Microck/reddit-cli/releases)
+## Install a release binary
 
-## cargo and nix
+1. On [GitHub Releases](https://github.com/Microck/reddit-cli/releases), choose the archive for your operating system and CPU.
+2. Verify the archive's SHA-256 checksum against the release manifest.
+3. Extract `reddit` or `reddit.exe` to a directory on your `PATH`.
+
+## Supported platforms for npm and release binaries
+
+| Operating system | CPU |
+| --- | --- |
+| Linux with glibc | x64 and arm64 |
+| macOS | x64 and arm64 |
+| Windows | x64 |
+
+## Install with Cargo or Nix
+
+To install with Cargo, run `cargo install` with the published package name.
 
 ```sh
 cargo install reddit-research --locked
+```
+
+To install with Nix, run `nix profile install` with the GitHub repository.
+
+```sh
 nix profile install github:Microck/reddit-cli
 ```
 
-for a checkout of the repository, use rustup with the pinned toolchain and run
-`cargo install --path . --locked` from the repository root. the
-[project readme](https://github.com/Microck/reddit-cli#quickstart) also lists
-the homebrew, scoop, and arch packaging templates.
+To install from a repository checkout, use rustup with the pinned toolchain.
+From the repository root, run `cargo install --path . --locked`.
 
-## check the install
+For Homebrew, Scoop, or Arch Linux packaging templates, see the [project README](https://github.com/Microck/reddit-cli#quickstart).
 
-```sh
-reddit --version
-reddit --source archive sub rust --limit 5
-```
+## Verify the installation
 
-for reddit api access, see [authentication](/docs/auth/).
+1. Check the installed version.
+
+   ```sh
+   reddit --version
+   ```
+
+2. List five posts from the archive source.
+
+   ```sh
+   reddit --source archive sub rust --limit 5
+   ```
+
+To use the live source, [set up credentials](/docs/auth/).

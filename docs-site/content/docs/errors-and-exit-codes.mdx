@@ -1,9 +1,11 @@
 ---
-title: errors and exit codes
-description: read the error envelope and branch on exit status.
+title: Errors and exit codes
+description: Error formats, codes, and exit statuses.
 ---
 
-errors go to stderr. with `json` or `jsonl`, stderr carries one object.
+## Error format
+
+The CLI reports errors on stderr. In JSON and JSONL, stderr contains one error object.
 
 ```json
 {
@@ -19,20 +21,24 @@ errors go to stderr. with `json` or `jsonl`, stderr carries one object.
 }
 ```
 
-`retry_after` is in seconds. scripts can branch on `error.code` and use the
-message and hint for diagnostics. pretty and markdown formats print
-`error[E_CODE]: message` with a separate hint line when available.
+`retry_after` is in seconds. Scripts can branch on `error.code`.
+The message and hint describe the failure and any available recovery steps.
 
-| code | exit | when |
+In pretty and Markdown formats, the CLI prints `error[E_CODE]: message`.
+If the error has a hint, the CLI prints the hint on a separate line.
+
+## Exit status by error code
+
+| Code | Exit status | Cause |
 | --- | --- | --- |
-| `E_USAGE` | 2 | invalid arguments, including argument parser errors |
-| `E_AUTH` | 3 | missing or invalid credentials, or the token endpoint rejects them |
-| `E_CONFIG` | 3 | unreadable config, bad permissions, or a store lock held during `cache clear` |
-| `E_NOT_FOUND` | 4 | http 404, a live redirect, a forbidden live resource with a recognized reason, or a missing post or user |
-| `E_RATE_LIMITED` | 5 | the rate limit is exhausted and the wait exceeds 15 seconds |
-| `E_UNSUPPORTED` | 2 | the selected backend does not support the flag or command |
-| `E_NETWORK` | 6 | dns, connection, or timeout failure after retries |
-| `E_UPSTREAM` | 7 | http 5xx, an unparseable body, an html block page, or an archive timeout |
-| `E_OFFLINE_MISS` | 8 | the local store cannot serve the offline request |
-| `E_SHARE_LINK` | 2 | a reddit share url needs to be replaced with a canonical thread url |
-| `E_STORE_SCHEMA` | 9 | local store schema mismatch |
+| `E_USAGE` | 2 | Invalid arguments, including errors from the argument parser. |
+| `E_AUTH` | 3 | Credentials are missing or invalid, or the token endpoint rejects the credentials. |
+| `E_CONFIG` | 3 | The CLI cannot read the config, permissions are invalid, or another process holds the store lock during `cache clear`. |
+| `E_NOT_FOUND` | 4 | HTTP 404, a redirect from the live source, a forbidden live resource with a recognized reason, or a missing post or user. |
+| `E_RATE_LIMITED` | 5 | The source reaches its rate limit, and the wait exceeds 15 seconds. |
+| `E_UNSUPPORTED` | 2 | The selected source does not support the flag or command. |
+| `E_NETWORK` | 6 | A DNS, connection, or timeout failure persists after retries. |
+| `E_UPSTREAM` | 7 | HTTP 5xx, a response the CLI cannot parse, an HTML block page, or a timeout from the archive source. |
+| `E_OFFLINE_MISS` | 8 | The local store has no response for the offline request. |
+| `E_SHARE_LINK` | 2 | The CLI cannot resolve the Reddit share URL. The command accepts a canonical thread URL. |
+| `E_STORE_SCHEMA` | 9 | The local store schema does not match the schema the CLI expects. |

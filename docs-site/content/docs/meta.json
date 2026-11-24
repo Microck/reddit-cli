@@ -2,15 +2,15 @@
   "title": "reddit-cli",
   "pages": [
     "index",
-    "---get started---",
+    "---Get started---",
     "install",
     "auth",
-    "---use reddit---",
+    "---Use reddit---",
     "sources",
     "research-workflows",
     "output",
     "store",
-    "---reference---",
+    "---Reference---",
     "reference",
     "errors-and-exit-codes"
   ]
