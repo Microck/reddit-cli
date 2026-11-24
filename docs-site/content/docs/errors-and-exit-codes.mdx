@@ -1,0 +1,38 @@
+---
+title: errors and exit codes
+description: read the error envelope and branch on exit status.
+---
+
+errors go to stderr. with `json` or `jsonl`, stderr carries one object.
+
+```json
+{
+  "error": {
+    "code": "E_RATE_LIMITED",
+    "message": "rate limit reached",
+    "retryable": true,
+    "http_status": 429,
+    "retry_after": 42,
+    "hint": "wait before retrying",
+    "suggested_commands": []
+  }
+}
+```
+
+`retry_after` is in seconds. scripts can branch on `error.code` and use the
+message and hint for diagnostics. pretty and markdown formats print
+`error[E_CODE]: message` with a separate hint line when available.
+
+| code | exit | when |
+| --- | --- | --- |
+| `E_USAGE` | 2 | invalid arguments, including argument parser errors |
+| `E_AUTH` | 3 | missing or invalid credentials, or the token endpoint rejects them |
+| `E_CONFIG` | 3 | unreadable config, bad permissions, or a store lock held during `cache clear` |
+| `E_NOT_FOUND` | 4 | http 404, a live redirect, a forbidden live resource with a recognized reason, or a missing post or user |
+| `E_RATE_LIMITED` | 5 | the rate limit is exhausted and the wait exceeds 15 seconds |
+| `E_UNSUPPORTED` | 2 | the selected backend does not support the flag or command |
+| `E_NETWORK` | 6 | dns, connection, or timeout failure after retries |
+| `E_UPSTREAM` | 7 | http 5xx, an unparseable body, an html block page, or an archive timeout |
+| `E_OFFLINE_MISS` | 8 | the local store cannot serve the offline request |
+| `E_SHARE_LINK` | 2 | a reddit share url needs to be replaced with a canonical thread url |
+| `E_STORE_SCHEMA` | 9 | local store schema mismatch |

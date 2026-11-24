@@ -1,0 +1,17 @@
+{
+  "title": "reddit-cli",
+  "pages": [
+    "index",
+    "---get started---",
+    "install",
+    "auth",
+    "---use reddit---",
+    "sources",
+    "research-workflows",
+    "output",
+    "store",
+    "---reference---",
+    "reference",
+    "errors-and-exit-codes"
+  ]
+}

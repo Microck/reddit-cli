@@ -66,7 +66,7 @@ reddit search QUERY [-s|--sub NAME]... [--type posts|comments|subs|users =posts]
                     [--author U] [--since DATE] [--until DATE]
                     [--limit N=25] [--after CURSOR]
                     [--rank interleave|score|new|comments =interleave] [--comments K=0]
-reddit thread URL_OR_ID [--comment ID] [--sort confidence|top|new|controversial|old|qa =confidence]
+reddit thread URL_OR_ID [--comment ID] [--sort confidence|top|new|controversial|old|qa (default: live confidence, archive top)]
                         [--depth N] [--limit N=200] [--full] [--max-requests N=50] [-o FILE]
 reddit user NAME [--posts | --comments | --overview (default)] [--sort new|hot|top|controversial =new]
                  [--time ...=all] [--since DATE] [--until DATE] [--limit N=25] [--after CURSOR]
@@ -315,6 +315,8 @@ UserSummary { name, created_utc, created, total_karma|null }
 List payloads: one item per line, no envelope. Non-list payloads: same as JSON
 on one line. `thread`: post line then comments flattened in pre-order, each
 with `depth`.
+`jsonl` has no envelope, so it carries no `meta`; use `json` when `meta.notes`,
+`meta.after` or rate-limit state matter.
 
 ### 6.3 Markdown (`md`)
 Compact, for reading and LLM context. Threads:

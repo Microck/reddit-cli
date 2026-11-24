@@ -1,6 +1,19 @@
-<img src="assets/icon.svg" width="64" height="64" alt="">
+<p align="center">
+  <img src=".github/assets/reddit-cli-logo.png" width="720" alt="reddit cli logo">
+</p>
 
-# reddit-cli
+<p align="center">
+  <a href="https://github.com/Microck/reddit-cli/releases"><img src="https://img.shields.io/github/v/release/Microck/reddit-cli?display_name=tag&style=flat-square&label=release&color=000000" alt="release badge"></a>
+  <a href="https://www.npmjs.com/package/reddit-research"><img src="https://img.shields.io/npm/dt/reddit-research?style=flat-square&label=downloads&color=000000" alt="npm downloads"></a>
+  <a href="https://github.com/Microck/reddit-cli/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Microck/reddit-cli/ci.yml?branch=main&style=flat-square&label=ci&color=000000" alt="ci badge"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-mit-000000?style=flat-square" alt="license badge"></a>
+</p>
+
+---
+
+`reddit` is a read-only terminal cli for researching reddit. browse subreddits, search across several communities at once, read full comment threads with the hidden replies expanded, and look up users, through the live reddit api or the arctic shift archive when you have no api access. everything it fetches lands in a local store you can search offline. output is json when piped, so scripts, `jq` and agents read the same thing. `--format md` is for reading.
+
+[documentation](https://reddit.micr.dev/docs) | [npm](https://www.npmjs.com/package/reddit-research) | [github](https://github.com/Microck/reddit-cli)
 
 ## why
 
@@ -29,7 +42,7 @@ If npm requires approval for lifecycle scripts, install with
 Try a listing from the archive without credentials.
 
 ```sh
-reddit --source archive sub rust --sort new --limit 5
+reddit --source archive sub rust --limit 5
 ```
 
 ## data sources

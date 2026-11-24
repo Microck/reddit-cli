@@ -1,0 +1,16 @@
+---
+title: command reference
+description: help for every command and subcommand, generated from the reddit binary.
+---
+
+these pages show the help from the built `reddit` binary. run
+`reddit COMMAND --help` to see the help for your installed version.
+
+- [global flags](/docs/reference/global-flags/) apply across commands.
+- [data sources](/docs/sources/#backend-support-matrix) lists backend-specific options and limits.
+- [research workflows](/docs/research-workflows/) shows examples you can run.
+
+listing commands default to 25 results. threads default to 200 comments.
+`--limit` accepts 1 through 1000. live and archive listings fetch pages of
+up to 100 results. pass `meta.after` back as `--after` for the same backend
+when a response supplies a cursor.

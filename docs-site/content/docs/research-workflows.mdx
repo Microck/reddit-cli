@@ -1,0 +1,77 @@
+---
+title: research workflows
+description: find discussions, read them in context, and revisit them offline.
+---
+
+## search several subreddits
+
+this searches two communities for posts and attaches up to three top-level
+comments to each hit. `--rank new` orders the merged results by date.
+
+```sh
+reddit --source archive --format json search 'embedded rust' \
+  --sub rust --sub embedded --limit 10 --rank new --comments 3 > results.json
+jq '.data[] | {title, permalink, top_comments}' results.json
+jq '.meta.notes' results.json
+```
+
+each subreddit gets its own search. the cli deduplicates posts and
+crossposts before applying the final limit. if one subreddit fails, its
+error appears in `meta.notes`. if a post's comment fetch fails,
+`top_comments` is empty and a note records the failure. omit `--after`
+when you pass more than one `--sub`.
+
+## read a thread with hidden replies
+
+with [live credentials](/docs/auth/) configured, paste a canonical thread
+url or use the post id from a search result. replace `POST_ID` below.
+
+```sh
+reddit --source live --format json thread POST_ID --full > thread.json
+jq '.data | {complete, comments_returned, unresolved}' thread.json
+
+reddit --source live thread POST_ID --full -o thread.md
+```
+
+`--full` asks the live api for collapsed replies. the default budget is 50
+requests. inspect `data.complete` and `data.unresolved` to see what you got.
+a depth or comment limit can also leave the tree incomplete. if you use the
+archive, you can omit `--full` because the archive endpoint returns a tree
+directly.
+
+if you have a reddit share url containing `/s/`, open it in a browser and
+copy the canonical thread url. a thread url with a comment id focuses the
+thread on that comment. you can also pass `--comment ID`.
+
+## search archived comments by date
+
+```sh
+reddit --source archive --format jsonl search 'borrow checker' \
+  --type comments --sub rust --since 2025-01-01 --until 2025-06-30
+```
+
+archive post and comment searches require `--sub` or `--author`. dates
+accept `YYYY-MM-DD`, rfc3339, epoch seconds, or relative values such as
+`30d`, `12h`, `6m` (months), and `1y`.
+
+## revisit results offline
+
+```sh
+reddit cache search '"borrow checker"' --sub rust --kind comment --limit 10
+```
+
+`cache search` searches the text of posts and comments that commands
+already saved. use `--offline` to rerun a previously cached request without
+a network call. see [local store](/docs/store/) for the difference.
+
+## give an agent the cli instructions
+
+```sh
+reddit skills list
+reddit --format md skills get reddit-cli
+```
+
+give the printed skill to an agent that can run `reddit`. request
+`--format json` for research commands, check the exit code and
+`meta.notes`, and cite the `permalink` of the post or comment you quote.
+the site also publishes a [plain-text docs index](/llms.txt).

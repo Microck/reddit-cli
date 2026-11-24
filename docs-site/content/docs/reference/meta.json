@@ -1,0 +1,25 @@
+{
+  "title": "command reference",
+  "pages": [
+    "index",
+    "global-flags",
+    "auth",
+    "auth-status",
+    "auth-login",
+    "auth-logout",
+    "sub",
+    "about",
+    "search",
+    "thread",
+    "user",
+    "cache",
+    "cache-search",
+    "cache-stats",
+    "cache-prune",
+    "cache-clear",
+    "skills",
+    "skills-list",
+    "skills-get",
+    "completions"
+  ]
+}

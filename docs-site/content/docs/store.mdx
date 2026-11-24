@@ -1,0 +1,60 @@
+---
+title: local store
+description: find saved posts and comments and manage local retention.
+---
+
+the cli saves http responses and indexes posts and comments in sqlite.
+`reddit cache search` uses sqlite fts5 over title, body, author, and
+subreddit, ranked by `bm25`. you can filter by subreddit, author, or kind.
+
+## paths
+
+the platform config and data directories each contain a `reddit-cli/`
+subdirectory. on linux these are typically `~/.config/reddit-cli/` and
+`~/.local/share/reddit-cli/`, or the corresponding xdg locations.
+
+| file | directory override |
+| --- | --- |
+| `config.toml` | `REDDIT_CLI_CONFIG_DIR` |
+| `store.sqlite`, `token.json` | `REDDIT_CLI_DATA_DIR` |
+
+each override is the directory that holds the files directly. on unix the
+cli creates or tightens these directories to mode `0700`.
+
+## cache flags and expiration
+
+| option | behavior |
+| --- | --- |
+| `--offline` | uses cached responses without network requests, even after their ttl. a miss is `E_OFFLINE_MISS`. |
+| `--refresh` | skips cache reads and writes fresh results to the cache. |
+| `--no-cache` | skips reads and writes, including writes to the item index. |
+
+http responses expire after 5 minutes for live listings and search, 10
+minutes for live threads, 15 minutes for live about and user responses, and
+60 minutes for archive responses. `cache search` searches the local item
+index. it does not rerun the upstream query.
+
+## retention and deletion
+
+the default retention is `30d`. set `retention` under `[store]` in
+`config.toml` to change it. when the store opens, the cli removes older
+responses and items at most once per hour.
+
+when a fetch shows a post or comment as deleted or removed, the cli replaces
+the stored text with that marker. a later fetch, including one from the
+archive, cannot restore text over a stored marker. the first marker also
+invalidates cached responses containing the item's fullname.
+
+## manage the cache
+
+```sh
+reddit cache search '"borrow checker"' --sub rust --kind post
+reddit cache stats
+reddit cache prune --older-than 7d
+```
+
+`cache prune` uses configured retention if you omit `--older-than`.
+`cache clear` deletes the local database and cached oauth token. if another
+process holds the store lock, it exits with `E_CONFIG`. use `cache clear`
+to recover from `E_STORE_SCHEMA` after deciding you can discard the old
+store.

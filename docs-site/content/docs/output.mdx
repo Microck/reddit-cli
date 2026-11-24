@@ -1,0 +1,69 @@
+---
+title: output formats
+description: read terminal output, markdown, json, or jsonl.
+---
+
+set the format with `--format` or `REDDIT_CLI_FORMAT`. the flag takes
+precedence over the environment.
+
+| format | behavior |
+| --- | --- |
+| `auto` | uses pretty output in a terminal and json when stdout is redirected or piped. |
+| `pretty` | prints for terminal reading. the layout can change. color requires a terminal and an unset `NO_COLOR`. |
+| `json` | prints one success object on stdout. |
+| `jsonl` | prints one line per list item or thread entry. other payloads use the json envelope on a single line. |
+| `md` | prints compact markdown for reading or giving a model context. |
+
+`reddit completions` prints the shell script directly. `--help` and
+`--version` print text.
+
+## json envelope
+
+a search with no matches can return the following.
+
+```json
+{
+  "data": [],
+  "meta": {
+    "source": "archive",
+    "cached": false,
+    "fetched_at": "2026-11-24T15:00:00Z",
+    "after": null,
+    "notes": []
+  }
+}
+```
+
+`data` holds the command payload. `meta.source` is `live`, `archive`, or
+`store`. offline and cache results use `store`. commands can add fields
+such as `more_count`, `requests`, and `rate_limit` to `meta`. item data
+includes `created_utc` in epoch seconds and `created` in rfc3339 utc.
+posts and comments carry absolute `permalink` urls.
+
+if `meta.after` is a cursor, pass it to `--after` with the same source.
+multi-subreddit searches have no cursor. archive subreddit and user name
+searches return one page.
+
+check `meta.notes` for caveats and partial results. with `pretty` and `md`,
+notes go to stderr and `--quiet` suppresses them. json keeps notes inside
+the envelope. jsonl lists and threads have no envelope, so use json when
+you need their notes or thread completeness metadata.
+
+## jsonl and markdown
+
+list payloads in jsonl have one item per line. a thread prints the post first,
+then comments in pre-order, with a `depth` on each comment. other payloads use
+the same single-line envelope as json.
+
+in markdown, a thread starts with the post and indents replies under their
+parents. post listings use a numbered list with permalinks and up to 280
+characters of post text per entry. unknown scores display as `? pts`.
+
+## write a thread to a file
+
+`reddit thread ... -o FILE` takes the file format from `.md`, `.json`, or
+`.jsonl`. other extensions use the selected format. stdout reports the
+path and byte count instead of printing the thread. in json and jsonl
+that report has the shape `{"data":{"path":"thread.md","bytes":123}}`.
+
+errors go to stderr. see [errors and exit codes](/docs/errors-and-exit-codes/).

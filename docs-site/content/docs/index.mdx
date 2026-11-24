@@ -1,0 +1,30 @@
+---
+title: reddit-cli
+description: a read-only terminal cli for researching reddit.
+---
+
+`reddit` browses subreddits, searches posts and comments, reads threads, and
+looks up users. it works with the live reddit data api and the arctic shift
+archive, and saves fetched posts and comments in a local store you can search
+offline.
+
+<Cards>
+  <Card title="install" href="/docs/install/">install the `reddit` binary and try an archive listing.</Card>
+  <Card title="set up live access" href="/docs/auth/">use app-only oauth with your existing reddit app.</Card>
+  <Card title="research workflows" href="/docs/research-workflows/">search across communities, follow threads, and revisit results offline.</Card>
+  <Card title="command reference" href="/docs/reference/">read the help for each command and subcommand.</Card>
+</Cards>
+
+## try it
+
+the archive works without credentials. a listing uses `new` on the archive
+and `hot` on the live api unless you pass an explicit sort.
+
+```sh
+reddit --source archive sub rust --limit 5
+reddit --source archive search 'embedded rust' --sub rust --sub embedded --limit 5
+```
+
+the cli prints pretty output in a terminal and json when you pipe it. use
+`--format md` to read a thread or `--format json` when a script needs a
+predictable format. see [output](/docs/output/).

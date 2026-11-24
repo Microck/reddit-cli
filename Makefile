@@ -1,4 +1,4 @@
-.PHONY: fmt lint test check release-dry
+.PHONY: fmt lint test check release-dry docs
 
 fmt:
 	cargo fmt --check
@@ -14,3 +14,7 @@ check: fmt lint test
 release-dry: check
 	cargo publish --dry-run --locked --offline
 	cd npm && npm pack --dry-run --ignore-scripts --offline
+
+docs:
+	cargo build --locked --bin reddit
+	python3 scripts/gen-docs-reference.py "$(or $(CARGO_TARGET_DIR),target)/debug/reddit"

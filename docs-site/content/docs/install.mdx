@@ -1,0 +1,45 @@
+---
+title: install
+description: install the reddit binary on linux, macos, or windows.
+---
+
+## npm
+
+use node.js 18 or later. the postinstall step downloads the release binary
+for your platform.
+
+```sh
+npm install -g reddit-research
+```
+
+if npm requires approval for lifecycle scripts, use
+`npm install -g --allow-scripts=reddit-research reddit-research`.
+
+## release binary
+
+download the archive for your os and cpu. verify its sha-256 against the
+release's checksum manifest, then extract `reddit` or `reddit.exe` to a
+directory on your `PATH`. npm and the release archives cover linux with glibc
+and macos on x64 and arm64, plus windows on x64.
+[github releases](https://github.com/Microck/reddit-cli/releases)
+
+## cargo and nix
+
+```sh
+cargo install reddit-research --locked
+nix profile install github:Microck/reddit-cli
+```
+
+for a checkout of the repository, use rustup with the pinned toolchain and run
+`cargo install --path . --locked` from the repository root. the
+[project readme](https://github.com/Microck/reddit-cli#quickstart) also lists
+the homebrew, scoop, and arch packaging templates.
+
+## check the install
+
+```sh
+reddit --version
+reddit --source archive sub rust --limit 5
+```
+
+for reddit api access, see [authentication](/docs/auth/).
